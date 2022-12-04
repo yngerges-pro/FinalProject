@@ -66,21 +66,36 @@
 
 # prints 1 or 2 depending on the player
 .macro playerInput(%player, %label)
+	
+input:
+
 	aString("\nEnter a row ")
 	li $v0, 5
 	syscall	
 	move $s0, $v0
+	
+	bgt $s0, 3, invalid
 	
 	aString("\nEnter a column ")
 	li $v0, 5
 	syscall	
 	move $s1, $v0
 	
+	bgt $s1, 3, invalid
+	
+	# branch based on row choice
 	beq $s0, 1, r1
 	beq $s0, 2, r2
 	beq $s0, 3, r3
 	
+invalid:
+	aString("\ninvlaid input please try again. \n")
+	j input
+taken:
+	aString("\nthis spot is already taken. \n")
+	j input
 	
+# branch based on row and column choice
 r1:
 	beq $s1, 1, row1col1
 	beq $s1, 2, row1col2
@@ -96,9 +111,17 @@ r3:
 	beq $s1, 2, row3col2
 	beq $s1, 3, row3col3	
 
-row1col1:
+row1col1:	
+	
 	la $t0, row1
 	li $t1, %player
+	
+	# Check if spot has been taken	
+	lw $t2, 0($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 0($t0)
 	
 	printBoard
@@ -108,6 +131,13 @@ row1col1:
 row1col2:
 	la $t0, row1
 	li $t1, %player
+	
+	# Check if spot has been taken	
+	lw $t2, 4($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 4($t0)
 	
 	printBoard
@@ -116,6 +146,13 @@ row1col2:
 row1col3:
 	la $t0, row1
 	li $t1, %player
+	
+	# Check if spot has been taken	
+	lw $t2, 8($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 8($t0)
 	
 	printBoard
@@ -123,6 +160,13 @@ row1col3:
 row2col1:
 	la $t0, row2
 	li $t1, %player
+	
+	# Check if spot has been taken	
+	lw $t2, 0($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 0($t0)
 	
 	printBoard
@@ -130,6 +174,13 @@ row2col1:
 row2col2:
 	la $t0, row2
 	li $t1, %player
+	
+	# Check if spot has been taken	
+	lw $t2, 4($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 4($t0)
 	
 	printBoard
@@ -137,6 +188,13 @@ row2col2:
 row2col3:
 	la $t0, row2
 	li $t1, %player
+	
+	# Check if spot has been taken	
+	lw $t2, 8($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 8($t0)
 	
 	printBoard
@@ -144,6 +202,13 @@ row2col3:
 row3col1:
 	la $t0, row3
 	li $t1, %player
+	
+	# Check if spot has been taken	
+	lw $t2, 0($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 0($t0)
 	
 	printBoard
@@ -151,6 +216,12 @@ row3col1:
 row3col2:
 	la $t0, row3
 	li $t1, %player
+	
+	# Check if spot has been taken
+	lw $t2, 4($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
 	sw $t1, 4($t0)
 	
 	printBoard
@@ -158,10 +229,22 @@ row3col2:
 row3col3:
 	la $t0, row3
 	li $t1, %player
+	
+	# Check if spot has been taken
+	lw $t2, 8($t0) 
+	
+	beq $t2, 1, taken
+	beq $t2, 2, taken
+	
 	sw $t1, 8($t0)
 	
 	printBoard
 	j %label
+
+.end_macro
+
+.macro checkBoard(%player)
+	
 
 .end_macro
 
@@ -175,7 +258,7 @@ row3col3:
 	message: .asciiz "\nPlayer 1's Turn \n"
 	space: .asciiz " "
 .text
-
+# start of the program
 main:
 	aString("\nTIC TAC TOE \n")
 	aString("PLAYER ONE'S TURN \n")
@@ -187,6 +270,5 @@ player1:
 player2:
 	aString("\nPLAYER TWO'S TURN \n")
 	playerInput(2, player1)
-
 
 exit: exit
