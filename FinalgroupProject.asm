@@ -64,38 +64,8 @@
 	
 .end_macro
 
-.data
-
-	row1: .word 0, 0, 0
-	row2:.word 0, 0, 0
-	row3:.word 0, 0, 0 
-
-	Table: .word row1, row2, row3
-	message: .asciiz "\nPlayer 1's Turn \n"
-	space: .asciiz " "
-.text
-
-main:
-	printString(message)
-	#create a macro for the table
-	
-	aString("   c1 c2 c3\n")
-	
-	aString("r1 ")
-	Parray(row1)
-	aString("\n")
-	aString("r2 ")
-	Parray(row2)
-	aString("\n")
-	aString("r3 ")
-	Parray(row3)
-	aString("\n")
-	
-	j player1
-
-
-player1:
-	
+# prints 1 or 2 depending on the player
+.macro playerInput(%player, %label)
 	aString("\nEnter a row ")
 	li $v0, 5
 	syscall	
@@ -128,60 +98,95 @@ r3:
 
 row1col1:
 	la $t0, row1
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 0($t0)
 	
 	printBoard
+	j %label
 	
 	
 row1col2:
 	la $t0, row1
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 4($t0)
 	
-	printBoard	
+	printBoard
+	j %label	
 		
 row1col3:
 	la $t0, row1
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 8($t0)
 	
 	printBoard
+	j %label
 row2col1:
 	la $t0, row2
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 0($t0)
 	
 	printBoard
+	j %label
 row2col2:
 	la $t0, row2
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 4($t0)
 	
 	printBoard
+	j %label
 row2col3:
 	la $t0, row2
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 8($t0)
 	
 	printBoard
+	j %label
 row3col1:
 	la $t0, row3
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 0($t0)
 	
 	printBoard
+	j %label
 row3col2:
 	la $t0, row3
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 4($t0)
 	
 	printBoard
+	j %label
 row3col3:
 	la $t0, row3
-	li $t1, 1
+	li $t1, %player
 	sw $t1, 8($t0)
 	
 	printBoard
+	j %label
+
+.end_macro
+
+.data
+
+	row1: .word 0, 0, 0
+	row2:.word 0, 0, 0
+	row3:.word 0, 0, 0 
+
+	Table: .word row1, row2, row3
+	message: .asciiz "\nPlayer 1's Turn \n"
+	space: .asciiz " "
+.text
+
+main:
+	aString("\nTIC TAC TOE \n")
+	aString("PLAYER ONE'S TURN \n")
+	printBoard
+	
+player1:
+	aString("\nPLAYER ONE'S TURN \n")
+	playerInput(1, player2)	
+player2:
+	aString("\nPLAYER TWO'S TURN \n")
+	playerInput(2, player1)
+
 
 exit: exit
