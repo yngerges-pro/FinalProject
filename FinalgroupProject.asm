@@ -38,7 +38,7 @@
 # Macro for printing strings declared in .data
 .macro printString(%strings)
 	li $v0, 4
-    	la $a0, %strings
+    	la $a0, (%strings)
     syscall
 .end_macro
 
@@ -53,14 +53,31 @@
 	aString("   c1 c2 c3\n")
 	
 	aString("r1 ")
-	Parray(row1)
-	aString("\n")
-	aString("r2 ")
-	Parray(row2)
-	aString("\n")
-	aString("r3 ")
-	Parray(row3)
-	aString("\n")
+	
+	la    $t0, row1	
+	lb    $a0, 0($t0)            
+	li    $v0, 11                 
+	syscall
+	
+	lb    $a0, 1($t0)            
+	li    $v0, 11                 
+	syscall
+	
+	lb    $a0, 2($t0)            
+	li    $v0, 11                 
+	syscall                       
+	
+	
+	#Parray(row1)
+	
+	
+	#aString("\n")
+	#aString("r2 ")
+	#Parray(row2)
+	#aString("\n")
+	#aString("r3 ")
+	#Parray(row3)
+	#aString("\n")
 	
 .end_macro
 
@@ -250,25 +267,28 @@ row3col3:
 
 .data
 
-	row1: .word 0, 0, 0
-	row2:.word 0, 0, 0
-	row3:.word 0, 0, 0 
+	row1: .ascii "..."
+	row2: .ascii "..."
+	row3: .ascii "..."
 
 	Table: .word row1, row2, row3
 	message: .asciiz "\nPlayer 1's Turn \n"
 	space: .asciiz " "
+	rules: .asciiz "\nEach player takes turns selecting a spot on a 3 x 3 board.\n "
 .text
 # start of the program
 main:
 	aString("\nTIC TAC TOE \n")
+	#printString(rules)
+	
 	aString("PLAYER ONE'S TURN \n")
 	printBoard
 	
 player1:
 	aString("\nPLAYER ONE'S TURN \n")
-	playerInput(1, player2)	
+	playerInput('X', player2)	
 player2:
 	aString("\nPLAYER TWO'S TURN \n")
-	playerInput(2, player1)
+	playerInput('O', player1)
 
 exit: exit
