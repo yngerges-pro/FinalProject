@@ -125,7 +125,7 @@ row1col1:
 	sw $t1, 0($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 	
 	
 row1col2:
@@ -141,7 +141,7 @@ row1col2:
 	sw $t1, 4($t0)
 	
 	printBoard
-	j %label	
+	checkBoard(%label)	
 		
 row1col3:
 	la $t0, row1
@@ -156,7 +156,7 @@ row1col3:
 	sw $t1, 8($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 row2col1:
 	la $t0, row2
 	li $t1, %player
@@ -170,7 +170,7 @@ row2col1:
 	sw $t1, 0($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 row2col2:
 	la $t0, row2
 	li $t1, %player
@@ -184,7 +184,7 @@ row2col2:
 	sw $t1, 4($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 row2col3:
 	la $t0, row2
 	li $t1, %player
@@ -198,7 +198,7 @@ row2col3:
 	sw $t1, 8($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 row3col1:
 	la $t0, row3
 	li $t1, %player
@@ -212,7 +212,7 @@ row3col1:
 	sw $t1, 0($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 row3col2:
 	la $t0, row3
 	li $t1, %player
@@ -225,7 +225,7 @@ row3col2:
 	sw $t1, 4($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 row3col3:
 	la $t0, row3
 	li $t1, %player
@@ -239,12 +239,76 @@ row3col3:
 	sw $t1, 8($t0)
 	
 	printBoard
-	j %label
+	checkBoard(%label)
 
 .end_macro
 
-.macro checkBoard(%player)
+.macro checkBoard(%label)
 	
+	la $s0, row1
+	la $s1, row2
+	la $s2, row3
+	
+	lw $t0, 0($s0)
+	lw $t1, 4($s0)
+	lw $t2, 8($s0)	
+	
+	lw $t3, 0($s1)
+	lw $t4, 4($s1)
+	lw $t5, 8($s1)
+
+	lw $t6, 0($s2)
+	lw $t7, 4($s2)
+	lw $t8, 8($s2)
+	
+	to: beq $t0, $t1, top
+	le: beq $t0, $t3, left
+	bo: beq $t6, $t7, bottom
+	ri: beq $t2, $t5, right
+	ba: beq $t0, $t4, backslash
+	fo: beq $t6, $t4, forwardslash
+	
+	j %label
+	
+	top:
+		beq $t0, 0, le
+		beq $t0, $t2, win
+		beq $t0, $t3, left
+		beq $t6, $t7, bottom
+		beq $t2, $t5, right
+		beq $t0, $t4, backslash
+		beq $t6, $t4, forwardslash
+		j %label
+	left:
+		beq $t0, 0, bo
+		beq $t0, $t6, win
+		beq $t6, $t7, bottom
+		beq $t2, $t5, right
+		beq $t0, $t4, backslash
+		beq $t6, $t4, forwardslash		
+		j %label
+	bottom:
+		beq $t6, 0, ri
+		beq $t6, $t8, win
+		beq $t2, $t5, right
+		beq $t0, $t4, backslash
+		beq $t6, $t4, forwardslash
+		j %label
+	right:
+		beq $t2, 0, ba
+		beq $t2, $t8, win
+		beq $t0, $t4, backslash
+		beq $t6, $t4, forwardslash
+		j %label
+	backslash:
+		beq $t0, 0, fo
+		beq $t0, $t8, win
+		beq $t6, $t4, forwardslash
+		j %label
+	forwardslash:
+		beq $t6, 0, %label
+		beq $t6, $t2, win
+		j %label			 
 
 .end_macro
 
@@ -270,5 +334,8 @@ player1:
 player2:
 	aString("\nPLAYER TWO'S TURN \n")
 	playerInput(2, player1)
+	
+win:
+	aString("\nGAME END\n")
 
 exit: exit
