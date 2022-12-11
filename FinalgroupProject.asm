@@ -343,6 +343,26 @@ row3col3:
 
 .end_macro
 
+# reset the board
+.macro resetBoard
+	li $t1, 0
+	
+	la $t0, row1	
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	
+	la $t0, row2
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	
+	la $t0, row3
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+.end_macro
+
 .data
 
 	row1: .word 0, 0, 0
@@ -356,11 +376,45 @@ row3col3:
 .text
 # start of the program
 main:
-	pString("\n\nTIC TAC TOE \n")
+	pString("\n\n------TIC TAC TOE------\n")
 	
-	j gameStart
+	pString("\nr: Read the Rules \n")
+	pString("p: Play (2 players) \n")
+	pString("e: Exit the Game \n")
+	
+	pString("Enter your choice: ")
+	
+	li $v0, 12
+	syscall	
+	move $s4, $v0
+	
+	pString("\n")
+	
+	beq $s4, 'r', rules
+	beq $s4, 'p', gameStart
+	beq $s4, 'e', exit
+
+	j invalidChoice
+
+invalidChoice:
+	pString("\ninvalid input please try again. \n")
+	j main
+
+rules:
+	pString("\n-RULES FOR TIC TAC TOE-\n")
+	pString("1. The game is played on a grid that's 3 squares by 3 grid (of dots).\n")
+	pString("2. Player 1 is X, Player 2 is O. Players take turns putting their marks in empty spots.\n")
+	pString("3. The first player to get 3 of their marks in a row (up, down, across, or diagonally) is the winner.\n")
+	pString("4. When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie.\n")
+	
+	pString("\nEnter any key to exit ")
+	li $v0, 12
+	syscall
+	
+	j main
+
 gameStart:	
-	pString("Player One enter a name: ")
+	pString("\nPlayer One enter a name: ")
 	
 	li $v0, 8
 	la $a0, p1buffer
@@ -417,14 +471,32 @@ win:
 	pString("\n")
 	pName($s5)
 	pString(" Wins!\n")
-	j exit
+	j playagain
 win2:
 	pString("\n")
 	pName($s6)
 	pString(" Wins!\n")
-	j exit
+	j playagain
 tie:
 	pString("\nIT'S A TIE\n")
-	j exit
+	j playagain
+	
+playagain:
+	resetBoard
+	pString("play again? (Y or N) ")
+	
+	li $v0, 12
+	syscall	
+	move $s4, $v0
+	
+	pString("\n")
+	
+	beq $s4, 'Y', gameStart
+	beq $s4, 'y', gameStart
+	beq $s4, 'N', main
+	beq $s4, 'n', main	
+	
+	pString("invalid input please try again.\n")
+	j playagain
 
 exit: exit
