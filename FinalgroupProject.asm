@@ -12,6 +12,13 @@
         	syscall
 .end_macro
 
+.macro pName(%strings)
+	
+		li $v0, 4
+		la $a0, (%strings)
+		syscall
+.end_macro
+
 # Macro to exit the program
 .macro exit
 	li $v0, 10
@@ -94,10 +101,12 @@ input:
 	beq $s0, 3, r3
 	
 invalid:
-	pString("\ninvlaid input please try again. \n")
+	pString("\nInvalid input please try again. \n")
+	printBoard
 	j input
 taken:
-	pString("\nthis spot is already taken. \n")
+	pString("\nThis spot is already taken. \n")
+	printBoard
 	j input
 	
 # branch based on row and column choice
@@ -341,27 +350,78 @@ row3col3:
 	row3:.word 0, 0, 0 
 
 	Table: .word row1, row2, row3
+	
+	p1buffer: .space 300
+	p2buffer: .space 300
 .text
 # start of the program
 main:
-	pString("\nTIC TAC TOE \n")
-	pString("PLAYER ONE'S TURN \n")
+	pString("\n\nTIC TAC TOE \n")
+	
+	j gameStart
+gameStart:	
+	pString("Player One enter a name: ")
+	
+	li $v0, 8
+	la $a0, p1buffer
+	li $a1, 300
+	syscall
+	move $s5, $a0
+	
+	# Removed newline from player name to make printing better
+	removeNewLine:
+    		lbu $a3, p1buffer($a2)  
+   		addi $a2, $a2, 1
+    		bnez $a3, removeNewLine
+    		beq $a1, $a2, skip
+    		subi $a2, $a2, 2
+    		sb $0, p1buffer($a2)
+	skip:
+	# Reset arguements
+	la $a2, 0
+	la $a3, 0
+	pString("Player 2 Enter a name:: ")
+	
+	li $v0, 8
+	la $a0, p2buffer
+	li $a1, 300
+	syscall
+	move $s6, $a0
+	
+	# Removed newline from player name to make printing better
+	removeNewLine2:
+    		lbu $a3, p2buffer($a2)  
+   		addi $a2, $a2, 1
+    		bnez $a3, removeNewLine2
+    		beq $a1, $a2, skip
+    		subi $a2, $a2, 2
+    		sb $0, p2buffer($a2)
+	skip2:
+		
 	printBoard
 	
 player1:
-	pString("\nPLAYER ONE'S TURN (X) \n")
+	pString("\n")
+	pName($s5)
+	pString("'s Turn (X) \n")
 	playerInput(1, player2)	
 player2:
-	pString("\nPLAYER TWO'S TURN (O)\n")
+	pString("\n")
+	pName($s6)
+	pString("'s Turn (O)\n")
 	playerInput(2, player1)
 	
 win:
 	# Win msg based on current player
 	beq $s7, 2, win2
-	pString("\nPlayer One Wins!\n")
+	pString("\n")
+	pName($s5)
+	pString(" Wins!\n")
 	j exit
 win2:
-	pString("\nPlayer Two Wins!\n")
+	pString("\n")
+	pName($s6)
+	pString(" Wins!\n")
 	j exit
 tie:
 	pString("\nIT'S A TIE\n")
