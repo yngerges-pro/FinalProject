@@ -312,15 +312,22 @@ row3col3:
 		
 	checkTie:
 		z0:bnez $t0, z1
+		j %label
 		z1:bnez $t1, z2
+		j %label
 		z2:bnez $t2, z3
+		j %label
 		z3:bnez $t3, z4
+		j %label
 		z4:bnez $t4, z5
+		j %label
 		z5:bnez $t5, z6
+		j %label
 		z6:bnez $t6, z7
+		j %label
 		z7:bnez $t7, z8
+		j %label
 		z8:bnez $t8, tie
-		
 		j %label
 
 .end_macro
