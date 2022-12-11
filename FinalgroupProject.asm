@@ -12,27 +12,38 @@
         	syscall
 .end_macro
 
-# Macro for printing array given name
+# Macro printing out each row of the board
 .macro Parray(%arr)
 	la $s0, %arr
-	#print element of the array
 	li $t0, 0
-	
+	# prints X or O based on which player if any occupies a spot
 	loop:
-		#get the element at position $t0, store in $t1
 		lw $s0, %arr($t0)
-		#print out the value $t1
-		li $v0, 1
-		move $a0, $s0
-		syscall
 		
+		beq $s0, 1, printX
+		beq $s0, 2, printO
+							
+		aString(".")
 		aString("  ")
-		#increase $t0 by 3, the size of a word (so we can go to next word in array)
 		addi $t0, $t0, 4
 		
-		#if t0 is less than 9, run loop
-		#since each word is 3 bytes, and there are 5 elements, we know 20 will be the greatest
 		blt $t0, 10, loop
+		bgt $t0, 9, printfinish
+		
+	printX:					
+		aString("X")
+		aString("  ")
+		addi $t0, $t0, 4
+		
+		blt $t0, 10, loop
+		bgt $t0, 9, printfinish
+	printO:					
+		aString("O")
+		aString("  ")
+		addi $t0, $t0, 4
+		
+		blt $t0, 10, loop
+	printfinish:
 .end_macro
 	
 # Macro for printing strings declared in .data
@@ -48,10 +59,9 @@
 	syscall
 .end_macro
 
-# Macro for printing strings declared in .data
+# Macro responsible for printing the layout of the board.
 .macro printBoard
 	aString("   c1 c2 c3\n")
-	
 	aString("r1 ")
 	Parray(row1)
 	aString("\n")
