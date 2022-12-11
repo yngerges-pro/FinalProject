@@ -3,7 +3,7 @@
 #Objective: Tic Tac Toe
 
 # Macro for printing strings not declared in .data
-.macro aString(%strings)
+.macro pString(%strings)
     	.data
 		strings: .asciiz %strings
 	.text
@@ -12,8 +12,14 @@
         	syscall
 .end_macro
 
+# Macro to exit the program
+.macro exit
+	li $v0, 10
+	syscall
+.end_macro
+
 # Macro printing out each row of the board
-.macro Parray(%arr)
+.macro pRow(%arr)
 	la $s0, %arr
 	li $t0, 0
 	# prints X or O based on which player if any occupies a spot
@@ -23,54 +29,41 @@
 		beq $s0, 1, printX
 		beq $s0, 2, printO
 							
-		aString(".")
-		aString("  ")
+		pString(".")
+		pString("  ")
 		addi $t0, $t0, 4
 		
 		blt $t0, 10, loop
 		bgt $t0, 9, printfinish
 		
 	printX:					
-		aString("X")
-		aString("  ")
+		pString("X")
+		pString("  ")
 		addi $t0, $t0, 4
 		
 		blt $t0, 10, loop
 		bgt $t0, 9, printfinish
 	printO:					
-		aString("O")
-		aString("  ")
+		pString("O")
+		pString("  ")
 		addi $t0, $t0, 4
 		
 		blt $t0, 10, loop
 	printfinish:
 .end_macro
-	
-# Macro for printing strings declared in .data
-.macro printString(%strings)
-	li $v0, 4
-    	la $a0, %strings
-    syscall
-.end_macro
-
-# Macro to exit the program
-.macro exit
-	li $v0, 10
-	syscall
-.end_macro
 
 # Macro responsible for printing the layout of the board.
 .macro printBoard
-	aString("   c1 c2 c3\n")
-	aString("r1 ")
-	Parray(row1)
-	aString("\n")
-	aString("r2 ")
-	Parray(row2)
-	aString("\n")
-	aString("r3 ")
-	Parray(row3)
-	aString("\n")
+	pString("   c1 c2 c3\n")
+	pString("r1 ")
+	pRow(row1)
+	pString("\n")
+	pString("r2 ")
+	pRow(row2)
+	pString("\n")
+	pString("r3 ")
+	pRow(row3)
+	pString("\n")
 	
 .end_macro
 
@@ -79,14 +72,14 @@
 	
 input:
 
-	aString("\nEnter a row ")
+	pString("\nEnter a row ")
 	li $v0, 5
 	syscall	
 	move $s0, $v0
 	
 	bgt $s0, 3, invalid
 	
-	aString("\nEnter a column ")
+	pString("\nEnter a column ")
 	li $v0, 5
 	syscall	
 	move $s1, $v0
@@ -99,10 +92,10 @@ input:
 	beq $s0, 3, r3
 	
 invalid:
-	aString("\ninvlaid input please try again. \n")
+	pString("\ninvlaid input please try again. \n")
 	j input
 taken:
-	aString("\nthis spot is already taken. \n")
+	pString("\nthis spot is already taken. \n")
 	j input
 	
 # branch based on row and column choice
@@ -254,7 +247,7 @@ row3col3:
 .end_macro
 
 .macro checkBoard(%label)
-	
+	# load values of each spot into registers
 	la $s0, row1
 	la $s1, row2
 	la $s2, row3
@@ -270,6 +263,8 @@ row3col3:
 	lw $t6, 0($s2)
 	lw $t7, 4($s2)
 	lw $t8, 8($s2)
+
+    #Checks for each possible 3 in a row
 	
 	to: beq $t0, $t1, top
 	le: beq $t0, $t3, left
@@ -329,23 +324,21 @@ row3col3:
 	row3:.word 0, 0, 0 
 
 	Table: .word row1, row2, row3
-	message: .asciiz "\nPlayer 1's Turn \n"
-	space: .asciiz " "
 .text
 # start of the program
 main:
-	aString("\nTIC TAC TOE \n")
-	aString("PLAYER ONE'S TURN \n")
+	pString("\nTIC TAC TOE \n")
+	pString("PLAYER ONE'S TURN \n")
 	printBoard
 	
 player1:
-	aString("\nPLAYER ONE'S TURN \n")
+	pString("\nPLAYER ONE'S TURN \n")
 	playerInput(1, player2)	
 player2:
-	aString("\nPLAYER TWO'S TURN \n")
+	pString("\nPLAYER TWO'S TURN \n")
 	playerInput(2, player1)
 	
 win:
-	aString("\nGAME END\n")
+	pString("\nGAME END\n")
 
 exit: exit
