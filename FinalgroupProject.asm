@@ -71,7 +71,9 @@
 .macro playerInput(%player, %label)
 	
 input:
-
+	# Load current player 
+	li $s7, %player
+	
 	pString("\nEnter a row ")
 	li $v0, 5
 	syscall	
@@ -347,15 +349,22 @@ main:
 	printBoard
 	
 player1:
-	pString("\nPLAYER ONE'S TURN \n")
+	pString("\nPLAYER ONE'S TURN (X) \n")
 	playerInput(1, player2)	
 player2:
-	pString("\nPLAYER TWO'S TURN \n")
+	pString("\nPLAYER TWO'S TURN (O)\n")
 	playerInput(2, player1)
 	
 win:
-	pString("\nGAME END\n")
+	# Win msg based on current player
+	beq $s7, 2, win2
+	pString("\nPlayer One Wins!\n")
+	j exit
+win2:
+	pString("\nPlayer Two Wins!\n")
+	j exit
 tie:
 	pString("\nIT'S A TIE\n")
+	j exit
 
 exit: exit
