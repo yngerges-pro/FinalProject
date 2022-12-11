@@ -275,7 +275,7 @@ row3col3:
 	midvert: beq $t1, $t4, midvert2
 	midhoriz: beq $t3, $t4, midhoriz2
 	
-	j %label
+	j checkTie
 	
 	top2:
 		beq $t0, 0, left1
@@ -306,8 +306,21 @@ row3col3:
 		beq $t1, $t7, win
 		j midhoriz
 	midhoriz2:
-		beq $t3, 0, %label
+		beq $t3, 0, checkTie
 		beq $t3, $t5, win
+		j checkTie
+		
+	checkTie:
+		z0:bnez $t0, z1
+		z1:bnez $t1, z2
+		z2:bnez $t2, z3
+		z3:bnez $t3, z4
+		z4:bnez $t4, z5
+		z5:bnez $t5, z6
+		z6:bnez $t6, z7
+		z7:bnez $t7, z8
+		z8:bnez $t8, tie
+		
 		j %label
 
 .end_macro
@@ -335,5 +348,7 @@ player2:
 	
 win:
 	pString("\nGAME END\n")
+tie:
+	pString("\nIT'S A TIE\n")
 
 exit: exit
