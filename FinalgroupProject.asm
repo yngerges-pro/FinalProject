@@ -266,54 +266,49 @@ row3col3:
 
     #Checks for each possible 3 in a row
 	
-	to: beq $t0, $t1, top
-	le: beq $t0, $t3, left
-	bo: beq $t6, $t7, bottom
-	ri: beq $t2, $t5, right
-	ba: beq $t0, $t4, backslash
-	fo: beq $t6, $t4, forwardslash
+	top1: beq $t0, $t1, top2
+	left1: beq $t0, $t3, left2
+	bottom1: beq $t6, $t7, bottom2
+	right1: beq $t2, $t5, right2
+	backslash1: beq $t0, $t4, backslash2
+	forwardslash1: beq $t6, $t4, forwardslash2
+	midvert: beq $t1, $t4, midvert2
+	midhoriz: beq $t3, $t4, midhoriz2
 	
 	j %label
 	
-	top:
-		beq $t0, 0, le
+	top2:
+		beq $t0, 0, left1
 		beq $t0, $t2, win
-		beq $t0, $t3, left
-		beq $t6, $t7, bottom
-		beq $t2, $t5, right
-		beq $t0, $t4, backslash
-		beq $t6, $t4, forwardslash
-		j %label
-	left:
-		beq $t0, 0, bo
-		beq $t0, $t6, win
-		beq $t6, $t7, bottom
-		beq $t2, $t5, right
-		beq $t0, $t4, backslash
-		beq $t6, $t4, forwardslash		
-		j %label
-	bottom:
-		beq $t6, 0, ri
+		j left1
+	left2:
+		beq $t0, 0, bottom1
+		beq $t0, $t6, win		
+		j bottom1
+	bottom2:
+		beq $t6, 0, right1
 		beq $t6, $t8, win
-		beq $t2, $t5, right
-		beq $t0, $t4, backslash
-		beq $t6, $t4, forwardslash
-		j %label
-	right:
-		beq $t2, 0, ba
+		j right1
+	right2:
+		beq $t2, 0, backslash1
 		beq $t2, $t8, win
-		beq $t0, $t4, backslash
-		beq $t6, $t4, forwardslash
-		j %label
-	backslash:
-		beq $t0, 0, fo
+		j backslash1
+	backslash2:
+		beq $t0, 0, forwardslash1
 		beq $t0, $t8, win
-		beq $t6, $t4, forwardslash
-		j %label
-	forwardslash:
-		beq $t6, 0, %label
+		j forwardslash1
+	forwardslash2:
+		beq $t6, 0, midvert
 		beq $t6, $t2, win
-		j %label			 
+		j midvert
+	midvert2:
+		beq $t1, 0, midhoriz
+		beq $t1, $t7, win
+		j midhoriz
+	midhoriz2:
+		beq $t3, 0, %label
+		beq $t3, $t5, win
+		j %label
 
 .end_macro
 
